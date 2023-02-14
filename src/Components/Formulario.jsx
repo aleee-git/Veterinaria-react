@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import Error from './Error'
 
 // Llamar props de App.jsx
-export default function Formulario({setPacientes, pacientes}) {
+export default function Formulario({setPacientes, pacientes, paciente, setPaciente}) {
 
   // Hook => Variable, modificador = valor inicial
   const [nombre, setNombre] = useState("");
@@ -11,6 +11,17 @@ export default function Formulario({setPacientes, pacientes}) {
   const [fecha, setFecha] = useState("");
   const [sintomas, setSintomas] = useState("");
   const [error, setError] = useState (false);
+
+  useEffect(() => {
+    if (Object.keys(paciente).length > 0 ) {
+      setNombre(paciente.nombre)
+      setPropietario(paciente.propietario)
+      setEmail(paciente.email)
+      setFecha(paciente.fecha)
+      setSintomas(paciente.sintomas)
+
+    }
+  }, [paciente]);
 
   const generarID = () => {
     const random = Math.random().toString(30);
@@ -37,12 +48,22 @@ export default function Formulario({setPacientes, pacientes}) {
       propietario, 
       email, 
       fecha, 
-      sintomas,
-      id : generarID()
+      sintomas
     }
 
-    // Copiar lo que hay en pacientes a objectoPaciente, un nuevo array
-    setPacientes ([...pacientes, objetoPaciente]);
+    if (paciente.id) {
+      // Editando = iterar la nueva lista
+      const actualizado = pacientes.map(pacienteActualizado => pacienteActualizado.id === paciente.id ? objetoPaciente : pacienteActualizado)
+
+      setPacientes(actualizado);
+      setPaciente({});
+      
+    } else {
+      // Agregando
+      // Copiar lo que hay en pacientes a objectoPaciente, un nuevo array
+      objetoPaciente.id = generarID();
+      setPacientes ([...pacientes, objetoPaciente]);
+    }
 
     // Reiniciar formulario
     setNombre ("");
@@ -50,9 +71,7 @@ export default function Formulario({setPacientes, pacientes}) {
     setEmail ("");
     setFecha ("");
     setSintomas ("");
-
   }
-
   
   return (
     <div className='md:w-1/2 lg:w-2/5 p-10'>
@@ -96,7 +115,7 @@ export default function Formulario({setPacientes, pacientes}) {
           className='border-2 w-full mt-2 rounded-md' type="text" id='sintomas'/>
         </div>
 
-        <input className='bg-amber-900 hover:bg-lime-700 cursor-pointer text-white p-3 rounded-lg w-full uppercase font-bold' type="submit" value="Agregar paciente" />
+        <input className='bg-amber-900 hover:bg-lime-700 cursor-pointer text-white p-3 rounded-lg w-full uppercase font-bold' type="submit" value={paciente.id ? "Editar paciente" : "Agregar paciente"} />
 
       </form>
 
